@@ -1,0 +1,52 @@
+# Reading a parquet file
+
+df=spark.read.parquet("/abc.parquet")
+
+# Writing a parquet file
+
+df.write.mode('append').parquet("/abc.parquet")
+df.write.mode('overwrite').parquet("/abc.parquet")
+
+#Querying over a parquet file
+
+df.createOrReplaceTempView("ParquetTable")
+pq_sql = spark.sql("select * from ParquetTable where salary >= 4000 ")
+
+#Create Parquet partition file
+
+df.write.partitionBy("gender","salary").mode("overwrite").parquet("/abc.parquet")
+
+#Retrieving from a partitioned Parquet file
+
+parDF2=spark.read.parquet("/abc.parquet")
+parDF2.show(truncate=False)
+
+
+
+# Read multiple json files
+df2 = spark.read.json(
+    ['resources/zipcode1.json','resources/zipcode2.json'])
+df2.show()  
+
+
+# Read all JSON files from a folder
+df3 = spark.read.json("resources/*.json")
+df3.show()
+
+#Write PySpark DataFrame to JSON file
+
+df2.write.json("/tmp/spark_output/zipcodes.json")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
