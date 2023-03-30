@@ -1,0 +1,36 @@
+
+//avg
+print("avg: " + str(df.select(avg("salary")).collect()[0][0]))
+
+#collect_list() function returns all values from an input column with duplicates.
+
+//collect_list
+df.select(collect_list("salary")).show(truncate=False)
+
+collect_set() function returns all values from an input column with duplicate values eliminated.
+
+//collect_set
+df.select(collect_set("salary")).show(truncate=False)
+
+#countDistinct() function returns the number of distinct elements in a columns
+
+df2 = df.select(countDistinct("department", "salary"))
+df2.show(truncate=False)
+print("Distinct Count of Department & Salary: "+str(df2.collect()[0][0]))
+
+
+#count() function returns number of elements in a column.
+print("count: "+str(df.select(count("salary")).collect()[0]))
+
+
+df.select(max("salary")).show(truncate=False)
+df.select(min("salary")).show(truncate=False)
+df.select(mean("salary")).show(truncate=False)
+df.select(sum("salary")).show(truncate=False)
+
+
+
+
+
+
+
