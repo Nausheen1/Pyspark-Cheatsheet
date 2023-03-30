@@ -1,0 +1,65 @@
+
+df.select('date', substring('date', 1,4).alias('year'), \
+                  substring('date', 5,2).alias('month'), \
+                  substring('date', 7,2).alias('day'))  
+
+#PySpark Replace Column Values in DataFrame
+
+
+# Replace part of string with another string
+from pyspark.sql.functions import regexp_replace
+df.withColumn('address', regexp_replace('address', 'Rd', 'Road')) \
+  .show(truncate=False)
+
+#Replace Column Value with Dictionary (map)
+
+#input: 
+#+---+------------------+-----+
+#|id |address           |state|
+#+---+------------------+-----+
+#|1  |14851 Jeffrey Road|DE   |
+#|2  |43421 Margarita St|NY   |
+#|3  |13111 Siemon Ave  |CA   |
+#+---+------------------+-----+
+
+#Replace values from Dictionary
+
+stateDic={'CA':'California','NY':'New York','DE':'Delaware'}
+df2=df.rdd.map(lambda x: 
+    (x.id,x.address,stateDic[x.state]) 
+    ).toDF(["id","address","state"])
+df2.show()
+
+#output
+#+---+------------------+----------+
+#| id|           address|     state|
+#+---+------------------+----------+
+#|  1|  14851 Jeffrey Rd|  Delaware|
+#|  2|43421 Margarita St|  New York|
+#|  3|  13111 Siemon Ave|California|
+#+---+------------------+----------+
+
+#Replace Column Value Character by Character
+#By using translate() string function you can replace character by character of DataFrame column value.
+#In the below example, every character of 1 is replaced with A, 2 replaced with B, and 3 replaced with C on the address column.
+
+
+#Using translate to replace character by character
+from pyspark.sql.functions import translate
+df.withColumn('address', translate('address', '123', 'ABC')) \
+  .show(truncate=False)
+
+#+---+------------------+-----+
+#|id |address           |state|
+#+---+------------------+-----+
+#|1  |A485A Jeffrey Rd  |DE   |
+#|2  |4C4BA Margarita St|NY   |
+#|3  |ACAAA Siemon Ave  |CA   |
+#+---+------------------+-----+
+
+#Replace Column with Another Column Value
+
+from pyspark.sql.functions import when
+targetDf = df.withColumn("timestamp1", \
+              when(df["session"] == 0, 999).otherwise(df["timestamp1"]))
+
