@@ -1,0 +1,72 @@
+#Timestamp String to DateType
+df.withColumn("timestamp",to_timestamp("input_timestamp"))
+
+#SQL string to TimestampType
+spark.sql("select to_timestamp('2019-06-24 12:01:19.000') as timestamp")
+
+#to_date() – function formats Timestamp to Date.
+df.withColumn("date_type",to_date("input_timestamp"))
+
++---+-----------------------+----------+
+|id |input_timestamp        |date_type |
++---+-----------------------+----------+
+|1  |2019-06-24 12:01:19.000|2019-06-24|
++---+-----------------------+----------+
+
+# Using Cast to convert Timestamp String to DateType
+df.withColumn('date_type', col('input_timestamp').cast('date')) \
+
+#PySpark date_format() – Convert Date to String format
+
+from pyspark.sql.functions import *
+
+df=spark.createDataFrame([["1"]],["id"])
+df.select(current_date().alias("current_date"), \
+      date_format(current_timestamp(),"yyyy MM dd").alias("yyyy MM dd"), \
+      date_format(current_timestamp(),"MM/dd/yyyy hh:mm").alias("MM/dd/yyyy"), \
+      date_format(current_timestamp(),"yyyy MMM dd").alias("yyyy MMMM dd"), \
+      date_format(current_timestamp(),"yyyy MMMM dd E").alias("yyyy MMMM dd E") \
+   ).show()
+
+
++------------+----------+----------------+------------+--------------------+
+|current_date|yyyy MM dd|      MM/dd/yyyy|yyyy MMMM dd|      yyyy MMMM dd E|
++------------+----------+----------------+------------+--------------------+
+|  2021-02-23|2021 02 23|02/23/2021 02:18| 2021 Feb 23|2021 February 23 Tue|
++------------+----------+----------------+------------+--------------------+
+
+
+#SQL
+spark.sql("select current_date() as current_date, "+
+      "date_format(current_timestamp(),'yyyy MM dd') as yyyy_MM_dd, "+
+      "date_format(current_timestamp(),'MM/dd/yyyy hh:mm') as MM_dd_yyyy, "+
+      "date_format(current_timestamp(),'yyyy MMM dd') as yyyy_MMMM_dd, "+
+      "date_format(current_timestamp(),'yyyy MMMM dd E') as yyyy_MMMM_dd_E").show()
+
+# datediff
+from pyspark.sql.functions import *
+data = [("1","2019-07-01"),("2","2019-06-24"),("3","2019-08-24")]
+df=spark.createDataFrame(data=data,schema=["id","date"])
+
+df.select(
+      col("date"),
+      current_date().alias("current_date"),
+      datediff(current_date(),col("date")).alias("datediff")
+    ).show()
+    
+ #months_between
+from pyspark.sql.functions import *
+df.withColumn("datesDiff", datediff(current_date(),col("date"))) \
+  .withColumn("montsDiff", months_between(current_date(),col("date"))) \
+  .withColumn("montsDiff_round",round(months_between(current_date(),col("date")),2)) \
+  .withColumn("yearsDiff",months_between(current_date(),col("date"))/lit(12)) \
+  .withColumn("yearsDiff_round",round(months_between(current_date(),col("date"))/lit(12),2)) \
+  .show()
+  
+  #sql example
+  
+spark.sql("select round(months_between('2019-07-01',current_date())/12,2) as years_diff").show()
+
+
+
+
