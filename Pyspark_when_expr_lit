@@ -1,0 +1,36 @@
+#When
+from pyspark.sql.functions import when
+df2 = df.withColumn("new_gender", when(df.gender == "M","Male")
+                                 .when(df.gender == "F","Female")
+                                 .when(df.gender.isNull() ,"")
+                                 .otherwise(df.gender))
+df2.show()
+
+#multiple conditions with when
+
+df5.withColumn(“new_column”, when((col(“code”) == “a”) | (col(“code”) == “d”), “A”)
+   .when((col(“code”) == “b”) & (col(“amt”) == “4”), “B”)
+   .otherwise(“A1”)).show()
+   
+  #expr()  -> PySpark expr() is a SQL function to execute SQL-like expressions and to use an existing DataFrame column value 
+  #as an expression argument to Pyspark built-in functions.
+  
+  
+# Using Cast() Function
+df.select("increment",expr("cast(increment as string) as str_increment")) \
+  .printSchema()
+  
+ # lit
+ 
+from pyspark.sql.functions import col,lit
+df2 = df.select(col("EmpId"),col("Salary"),lit("1").alias("lit_value1"))
+df2.show(truncate=False)
+
+
+
+
+
+
+
+
+
