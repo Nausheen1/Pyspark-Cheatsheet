@@ -1,0 +1,63 @@
+#PySpark Convert String to Array Column
+
+from pyspark.sql.functions import split, col
+df2 = df.select(split(col("name"),",").alias("NameArray")) \
+    .drop("name")
+df2.printSchema()
+df2.show()
+
+
+root
+ |-- NameArray: array (nullable = true)
+ |    |-- element: string (containsNull = true)
+
++------------------------+
+|NameArray               |
++------------------------+
+|[James,  A,  Smith]     |
+|[Michael,  Rose,  Jones]|
+|[Robert, K, Williams]   |
+|[Maria, Anne, Jones]    |
+|[Jen, Mary, Brown]      |
++------------------------+
+
+
+#Convert String to Array Column using SQL Query
+
+
+df.createOrReplaceTempView("PERSON")
+spark.sql("select SPLIT(name,',') as NameArray from PERSON") \
+    .show()
+    
+#PySpark – Convert array column to a String
+
+
++----------------+------------------+------------+
+|name            |languagesAtSchool |currentState|
++----------------+------------------+------------+
+|James,,Smith    |[Java, Scala, C++]|CA          |
+|Michael,Rose,   |[Spark, Java, C++]|NJ          |
+|Robert,,Williams|[CSharp, VB]      |NV          |
++----------------+------------------+------------+
+
+#Convert an array of String to String column using concat_ws()
+
+from pyspark.sql.functions import col, concat_ws
+df2 = df.withColumn("languagesAtSchool", concat_ws(",",col("languagesAtSchool")))
+
+
+
++----------------+-----------------+------------+
+|name            |languagesAtSchool|currentState|
++----------------+-----------------+------------+
+|James,,Smith    |Java,Scala,C++   |CA          |
+|Michael,Rose,   |Spark,Java,C++   |NJ          |
+|Robert,,Williams|CSharp,VB        |NV          |
++----------------+-----------------+------------+
+
+#
+df.createOrReplaceTempView("ARRAY_STRING")
+spark.sql("select name, concat_ws(',',languagesAtSchool) as languagesAtSchool," + \
+    " currentState from ARRAY_STRING") \
+    .show(truncate=False)
+
